@@ -1,51 +1,34 @@
-from E11 import Scraping
+# -*- encoding: utf-8 -*-
+#class for scraping
 
 import os
 
 import argparse
+import socket
 import requests
 from lxml import html
 from bs4 import BeautifulSoup
 
-parser = argparse.ArgumentParser()  
-parser.add_argument("-link", dest="param1")
-params = parser.parse_args()  
 
-url = (params.param1)
-
-if __name__ == "__main__":
-	
-	scraping = Scraping()
-	scraping.scrapingImages(url)
-
-
-
-#import urlparse
-
-class Scraping:
+def scrapingImages(url):
+    print("\nObteniendo imagenes de la url:"+ url)
     
-    
-				
-    def scrapingImages(self,url):
-        print("\nObteniendo imagenes de la url:"+ url)
-    
-        try:
-            response = requests.get(url)  
-            parsed_body = html.fromstring(response.text)
+    try:
+        response = requests.get(url)  
+        parsed_body = html.fromstring(response.text)
 
-            # expresion regular para obtener imagenes
-            images = parsed_body.xpath('//img/@src')
+        images = parsed_body.xpath('//img/@src')
 
-            print ('Imagenes %s encontradas' % len(images))
+        print ('Imagenes %s encontradas' % len(images))
     
-            #create directory for save images
-            os.system("mkdir images")
+
+        os.system("mkdir images")
     
-            for image in images:
-                if image.startswith("http") == False:
-                    download = url + image
-                else:
-                    download = image
+        for image in images:
+            if image.startswith("http") == False:
+                download = url + image
+            else:
+                download = image
                 print(download)
                 # download images in images directory
                 r = requests.get(download)
@@ -53,11 +36,11 @@ class Scraping:
                 f.write(r.content)
                 f.close()
                 
-        except Exception as e:
-                print(e)
-                print ("Error conexion con " + url)
-                pass
-
+    except Exception as e:
+        print(e)
+        print ("Error conexion con " + url)
+        pass
+            
 from PIL.ExifTags import TAGS, GPSTAGS
 from PIL import Image
 import os
@@ -115,4 +98,16 @@ def printMeta():
             except:
                 import sys, traceback
                 traceback.print_exc(file=sys.stdout)
-printMeta()
+    
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=' ',formatter_class=argparse.
+                                RawDescriptionHelpFormatter)
+    
+    parser.add_argument("-link", metavar='LINK', dest="link", required=True)
+
+    url = parser.parse_args().link
+
+    scrapingImages(url)
+    printMeta()
